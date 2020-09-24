@@ -10,18 +10,26 @@ export class NewsApiService {
     private http: HttpClient,
   ) {}
 
+  // Abstract this to an env file.
+  private API_KEY = 'removed';
+
   private newsFeedItems: NewsFeedItem[] = [];
-  private baseUrl = 'http://google.com';
+  private baseUrl = `https://newsapi.org/v2/top-headlines?country=in&apiKey=${this.API_KEY}`;
 
   getFeed(): NewsFeedItem[] {
-    if (this.newsFeedItems) {
+    if (this.newsFeedItems?.length) {
       return this.newsFeedItems;
     }
 
-    this.fetchFeedItems().pipe(take(1)).subscribe((response) => {
-      this.newsFeedItems = response;
+    this.fetchFeedItems().pipe(take(1)).subscribe((response: NewsApiResponse) => {
+      if (response?.status === 'ok') {
+        this.newsFeedItems = response.articles;
+      }
 
       return this.newsFeedItems;
+    }, (error: Error) => {
+      console.log('Error fetching news feed.');
+      return [];
     });
   }
 
@@ -34,7 +42,23 @@ export class NewsApiService {
   }
 }
 
-// TODO: Define when we actually know the schema.
+interface NewsApiResponse {
+  status: string;
+  totalResults: number;
+  articles: NewsFeedItem[];
+}
+
 export interface NewsFeedItem {
   [key: string]: any;
+  author?: string;
+  content?: string;
+  description?: string;
+  publishedAt: string;
+  source: {
+    id: string;
+    name: string
+  };
+  title: string;
+  url: string;
+  urlToImage: string;
 }

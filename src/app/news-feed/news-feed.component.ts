@@ -1,3 +1,4 @@
+import { NewsApiService } from './../services/news-api.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -6,9 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./news-feed.component.scss']
 })
 export class NewsFeedComponent implements OnInit {
-  constructor() {}
+  constructor(
+    private newsApiService: NewsApiService,
+  ) {}
 
   ngOnInit(): void {
-    console.log('Testing');
+    this.newsApiService.getFeed();
   }
 }
